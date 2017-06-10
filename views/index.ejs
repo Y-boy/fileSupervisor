@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>INDEX</title>
+	<%- include unit/quote.ejs %>
+	<!-- 引用.ejs -->
+</head>
+<body>
+	<div id="topBar">
+		<div class="container">
+			<div class="row">
+				<div id="searchBar" class="col-xs-12" style="padding-top: 8px; padding-bottom: 8px;">
+					<div class="input-group">
+						<input type="text" class="form-control input-sm" style="border: none; ">
+						<span class="input-group-btn">
+							<button class="btn btn-info btn-sm" type="button"><span class="glyphicon glyphicon-search"></span></button>
+						</span>
+					</div><!-- .input-group -->
+				</div><!-- #searchBar -->
+			</div>
+		</div>
+	</div><!-- #topBar -->
+	<div id="mainIndex">
+		<div class="container">
+			<div class="row">
+				<ul id="column-menu" class="nav nav-tabs" style="border-color: #337ab7; padding: 0px 10px;">
+					<li id="add_column" title="添加栏目">
+						<a href="#">
+							<span id="add_column_icon" class="glyphicon glyphicon-plus"></span>
+							<input type="text" id="add_column_inputArea" style="display: none;">
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div><!-- #mainIndex -->
+
+	<div id="mainContent">
+		<div class="container">
+			<div class="row">
+				<div class="col-xs-12">
+					<div class="col-md-2" id="section-menu">
+						<!-- <div>
+							<label>
+								<span id="section-2">section 2</span>
+								<a
+									class="show_toolbar"
+									tabindex="0"
+									role="button"
+									data-toggle="popover">
+									<span class="glyphicon glyphicon-chevron-right" ></span>
+								</a>
+							</label>
+							<ul class="article-pool">
+								<li>article 1</li>
+								<li>article 1</li>
+								<li>article 1</li>
+								<li>article 1</li>
+								<li>article 1</li>
+							</ul>
+						</div> -->
+						<label>
+							<span id="add_section" class="glyphicon glyphicon-plus" title="添加章节"></span>
+							<input type="text" id="add_section_inputArea" style="display: none;">
+						</label>
+					</div>
+					<div class="col-md-10" id="contentBox" style="margin: 20px 0px;">
+						<div id="addArticleArea" class="collapse">
+							<div>
+								<a id="cancel_add_article" href="#"><span class="glyphicon glyphicon-chevron-left"><label>放弃当前编辑</label></span></a>
+							</div>
+							<div class="filler" style="height: 20px"></div>
+							<label class="col-xs-2">当前目录：</label>
+							<div class="col-xs-10"><span id="col-title"></span> / <span id="sec-title"></span></div>
+							<div class="filler" style="height: 8px"></div>
+							<label class="col-xs-2">文章题目：</label>
+							<div class="col-xs-10">
+								<input type="text" id="article-title" class="form-control">
+							</div>
+							<div class="filler" style="height: 8px"></div>
+							<label class="col-xs-2" style="line-height: 5em;">文章描述：</label>
+							<div class="col-xs-10">
+								<textarea class="form-control" rows="3" id="article-describe"></textarea>
+							</div>
+							<div class="filler" style="height: 8px"></div>
+							<label class="col-xs-2">文章内容：</label>
+							<div class="col-xs-12">
+							    <script id="ueCon" type="text/plain" style="width: 100%; height: 480px;"></script>
+								<script type="text/javascript">
+							    	var ueObj = UE.getEditor('ueCon');
+								</script>
+							</div>
+							<div class="filler" style="height: 8px"></div>
+							<div class="col-xs-12">
+								<button type="button" class="btn btn-sm btn-primary" id="submit_article">提交文章</button>
+							</div>
+						</div><!-- #addArticleArea -->
+						<div id="showArticleArea" class="collapse in">
+							当前施工进度 / 未完成：文章发布、文章搜索
+						</div><!-- #showArticleArea -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div><!-- #mainContent -->
+
+	<script type="text/javascript">
+		
+		$(document).ready(function(){
+			ayncLoad();
+			loadToolbar();
+		});
+		
+		$(document).on("click", ".removeLabel", function(e){
+		// 删除栏目标签
+		// 对于加载先后顺序导致没有渲染到的元素，使用绑定的做法
+			var title = $(e.target).parent().text();
+			// $(e.target)获得事件对象
+			if(confirm("删除栏目 "+title+" ?")){
+				$.ajax({
+					url: "/deleteCol",
+					type: "post",
+					data: "id="+($(e.target).parent().parent().attr("id").split('column-'))[1],
+					success: function(data){
+						console.log("success");
+						ayncLoad();
+					},
+					error: function(err){
+						console.log(err);
+					}
+				});
+			}
+		});
+
+		$(document).on("click", ".column-title", function(e){
+		// 切换标签
+			$(".active").removeClass("active");
+			$(e.target).parent().parent().addClass("active");
+			// 页面标签切换
+			var currentId = ($(e.target).parent().parent().attr("id").split('column-'))[1];
+			// console.log(currentId);
+			$.ajax({
+				url: "/readCol/"+currentId,
+				type: "get",
+				success: function(data){
+					ayncLoad();
+				},
+				error: function(error){}
+			});
+		});
+		$(document).on("click", ".column-label", function(e){
+		// 防误触优化
+			$(e.target).find(".column-title").click();
+		});
+
+		$(document).on("click", ".glyphicon-pencil", function(e){
+		// 绑定事件：点击铅笔图标，触发模态框
+			$("#addArticleArea").collapse('show');
+			$("#showArticleArea").collapse('hide');
+			$("#article-title").val("");
+			$("#article-describe").val("");
+			ueObj.setContent("");
+			var span = $(e.target).parent().parent().parent().parent().find("span");
+			var secId = span.attr("id").split("section-")[1];
+			var secTitle = span.text();
+			var colId = $(".active").attr("id").split("column-")[1];
+			var colTitle = $(".active").find("a").find("span").text();
+			$("#col-title").text(colTitle);
+			$("#sec-title").text(secTitle);
+		});
+
+		$(document).keyup(function(e){
+		// 快捷键系统
+			if(e.which == 78 && e.ctrlKey && e.altKey){
+			// 设置快捷键：ctrl + alt + n 新建章节
+				$("#add_section").click();
+			} else if(e.which == 67 && e.ctrlKey && e.altKey){
+			// 设置快捷键：ctrl + alt + c 新建栏目
+				$("#add_column").click();
+			} else if(e.which == 37 && e.ctrlKey){
+				alert("turn left");
+			} else if(e.which == 39 && e.ctrlKey){
+				alert("turn right");
+			}
+		});
+
+		$("#add_column").click(function(){
+		// 点击添加标签后
+			historyId = "#" + $(".active").attr("id");
+			$(".active").removeClass("active");
+			$(this).addClass("active");
+			// 切换 .active
+
+			$("#add_column_icon").css({"display": "none"});
+			$("#add_column_inputArea")
+				.css({"display": "block"})
+				.focus()
+				.parent().css({"padding-bottom": "0px", "padding-top": "1px"});
+			// 样式设置
+		});
+		
+		$("#add_column_inputArea").blur(function(){
+		// 结束输入并离开输入框时
+			if($("#add_column_inputArea").val() == ""){
+			// 没有内容就当什么事都没发生，还原到添加前的状态
+				addLabelAfterAdd();
+				$(historyId).addClass("active");
+			} else{
+			// 否则就要创建一个栏目
+				var col = {
+					id: UUID(),
+					title: $("#add_column_inputArea").val(),
+					parent: "root",
+					visible: "1",
+					createDate: new Date().getTime(),
+					viewDate: new Date().getTime(),
+				};
+				$("#add_column_inputArea").val("");
+				$.ajax({
+					url: "/addCol",
+					type: "post",
+					data: col,
+					success: function(data){
+						addLabelAfterAdd();
+						ayncLoad();
+					},
+					error: function(error){
+						console.log(error);
+					}
+				});
+			}
+		});
+
+		$("#add_column_inputArea").keyup(function(e){
+		// 当摁了空格键
+			if(e.which == 13){
+				$("#add_column_inputArea").blur();
+			}
+		});
+
+		$("#add_section").click(function(){
+		// 点击添加标签后
+			historyId = "#" + $(".active").attr("id");
+			// 当前创建的章节所属父级栏目
+
+			$("#add_section").css({"display": "none"});
+			$("#add_section_inputArea")
+				.css({"display": "block"})
+				.focus()
+				.parent().css({"padding-bottom": "0px", "padding-top": "1px"});
+			// 样式设置
+		});
+		
+		$("#add_section_inputArea").blur(function(){
+		// 结束输入并离开输入框时
+			if($("#add_section_inputArea").val() == ""){
+			// 没有内容就当什么事都没发生，还原到添加前的状态
+				$("#add_section").css({"display": "block"});
+				$("#add_section_inputArea").css({"display": "none"});
+			} else{
+			// 否则就要创建一个章节
+				var sec = {
+					id: UUID(),
+					title: $("#add_section_inputArea").val(),
+					parent: (historyId.split("column-"))[1],
+					visible: "1",
+					createDate: new Date().getTime(),
+					viewDate: new Date().getTime(),
+				};
+				// console.log(sec);
+				$("#add_section_inputArea").val("");
+				$.ajax({
+					url: "/addCol",
+					type: "post",
+					data: sec,
+					success: function(data){
+						$("#add_section").css({"display": "block"});
+						$("#add_section_inputArea").css({"display": "none"});
+						ayncLoad();
+					},
+					error: function(error){
+						console.log("error");
+					}
+				});
+			}
+		});
+
+		$("#add_section_inputArea").keyup(function(e){
+		// 当摁了回车键
+			if(e.which == 13){
+				$("#add_section_inputArea").blur();
+			}
+		});
+
+		$("#cancel_add_article").click(function(){
+		// 放弃当前编辑
+			$("#addArticleArea").collapse('hide');
+			$("#showArticleArea").collapse('show');
+		});
+
+		$("#submit_article").click(function(){});
+	</script>
+</body>
+</html>

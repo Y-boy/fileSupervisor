@@ -1,0 +1,12 @@
+/*
+{
+	id: 'id',
+	title: 'title',
+	createDate: timestamp,
+	lastChangeDate: timestamp,
+	author: 'author',
+	abstract: 'abstract',
+	content: 'content',
+	attachment: 'attachment-path'
+}
+ */

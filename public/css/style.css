@@ -1,0 +1,90 @@
+body {
+	font-family: "Microsoft YaHei" !important;
+	background-image: url('../img/default/bg-body.png');
+}
+
+a {
+	color: #00B7FF;
+	outline: none !important;
+}
+
+input {
+	font: 14px "Microsoft YaHei";
+	outline: none !important;
+}
+
+div{
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+/* 填充物 */
+.filler{
+	width: 100%;
+	clear: both;
+}
+
+/* index.ejs */
+#column-menu > .active > a,
+#column-menu > .active > a:hover{
+	border-color: #337ab7 !important;
+	border-bottom-color: rgba(255, 255, 255, 0) !important;
+}
+#column-menu > li > a{
+	padding: 2px 10px;
+}
+#column-menu > li > a:hover{
+	background-color: #FFF !important;
+	border-bottom-color: #337ab7 !important;
+}
+#add_column_inputArea{
+	border: none;
+	border-bottom: solid 1px #337ab7;
+}
+#mainContent > .container > .row > div{
+	background-color: #fff !important;
+	min-height: 500px;
+	box-shadow: 0px 2px 2px #aaa;
+}
+#section-menu{
+	border-right: solid 1px #eee;
+}
+#contentBox{
+	border-left: solid 1px #eee;
+}
+.removeLabel{
+	margin-left: 3px;
+	font-size: 8px;
+}
+.glyphicon-remove:hover{
+	color: #d43f3a !important;
+}
+#section-menu{
+	padding-top: 20px;
+	padding-bottom: 20px;
+}
+#section-menu ul{
+	list-style: none;
+	padding: 0px;
+}
+
+#section-menu > label,
+#section-menu > div > label,
+#section-menu > div > .article-pool{
+	color: #337ab7;
+    display: block;
+    float: right;
+    clear: both;
+    cursor: pointer;
+
+	list-style: none;
+}
+.section-menu-toolbar > span{
+	display: initial;
+	margin: 0px 8px;
+}
+.modal-title > #col-title,
+.modal-title > #sec-title{
+	color: #337ab7;
+}
+/* index.ejs */
